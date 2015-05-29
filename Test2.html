@@ -1,0 +1,133 @@
+<html>
+	<head>
+		<title>My first Three.js app</title>
+		<style>
+			body { margin: 0; }
+			canvas { width: 100%; height: 100% }
+		</style>
+	</head>
+	<body>
+		<script src="http://threejs.org/build/three.min.js"></script>
+		<script src="http://threejs.org/examples/js/controls/OrbitControls.js"></script>
+		<script>
+			var parent, renderer, scene, camera, controls;
+			var SwingRot = 0;   //그네의 회전수치
+			var Rotstep = 0.01; // 회전을 얼만큼 시킬것인지..
+
+			init();
+			animate();
+
+			function init() {
+
+				// renderer
+				renderer = new THREE.WebGLRenderer();
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				document.body.appendChild( renderer.domElement );
+
+				// scene
+				scene = new THREE.Scene();
+	
+				// camera
+				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 100 );
+				camera.position.set( 20, 20, 20 );
+
+				// controls
+				controls = new THREE.OrbitControls( camera );
+				controls.minDistance = 10;
+				controls.maxDistance = 50;
+
+				// axes : x,y,z 축 가이드선 제공
+				scene.add( new THREE.AxisHelper( 20 ) );
+
+
+				//----기둥1
+				var geometry = new THREE.BoxGeometry( 0.5, 8, 0.5 );
+				var material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+				var cube = new THREE.Mesh( geometry, material );
+				cube.position.setX(-3);
+				scene.add( cube );
+		
+				//----기둥2
+				var geometry2 = new THREE.BoxGeometry( 0.5, 8, 0.5 );
+				var material2 = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+				var cube2 = new THREE.Mesh( geometry2, material2 );
+				cube2.position.setX(3);
+				scene.add( cube2 );
+			
+				//-----그네 지지대
+				var geometry = new THREE.BoxGeometry( 6, 0.3, 0.3 );
+				var material = new THREE.MeshBasicMaterial( { color: 0x95958F } );
+				var cube3 = new THREE.Mesh( geometry, material );
+				cube3.position.setX(0);
+				cube3.position.setY(4);
+				scene.add( cube3 );
+				
+				//움직이는 개체
+				
+				// geometry
+				var geometry = new THREE.BoxGeometry( 2, 0.4, 1.2 );
+				var geo_thin = new THREE.BoxGeometry( 0.3, 6.5, 0.3 );
+	
+				// material
+				var material = new THREE.MeshBasicMaterial( {
+					color: 0xffffff, 
+					wireframe: true
+				} );
+	
+				// parent
+				parent = new THREE.Object3D();
+				scene.add( parent );
+
+				// pivots
+				var pivot1 = new THREE.Object3D();
+				var pivot2 = new THREE.Object3D();
+				var pivot3 = new THREE.Object3D();
+				pivot1.rotation.z = 0;
+				pivot2.rotation.z = 0;
+				pivot3.rotation.z = 0;
+				parent.add( pivot1 );
+				parent.add( pivot2 );
+				parent.add( pivot3 );
+
+				// mesh
+				var mesh1 = new THREE.Mesh( geometry, material );
+				var mesh_left = new THREE.Mesh( geo_thin, material );
+				var mesh_right = new THREE.Mesh( geo_thin, material );
+				mesh1.position.y = -4.7;
+				
+				mesh_left.position.x = -1;
+				mesh_left.position.y = -1.5;
+				
+				mesh_right.position.x = 1;
+				mesh_right.position.y = -1.5;
+					
+				pivot1.add(mesh1);
+				pivot2.add(mesh_left);
+				pivot3.add(mesh_right);
+				
+				parent.position.y=4;
+	
+			}
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				//parent.rotation.x+= 0.01;
+			    	
+				//그네가 회전할때 일정수치를 넘어가면 방향을 바꿈
+				if(SwingRot > 1) Rotstep = - Rotstep;
+				if(SwingRot < -1) Rotstep = - Rotstep;
+				 //Rot Step 만큼 수치증가
+				SwingRot += Rotstep;
+				parent.rotation.x = SwingRot;
+
+				controls.update();
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+	</body>
+</html>
